@@ -86,8 +86,14 @@ strong { font-weight: 600; }
 .upload-icon { font-size: 1.35rem; opacity: .75; line-height: 1; }
 .upload-text { color: #3f6686; font-weight: 500; }
 .upload-sub { font-size: .78rem; color: var(--muted); }
-#preview { width:100%; aspect-ratio: 16 / 10; object-fit:cover; display:block; border-radius: 10px; }
-#preview[hidden] { display: none !important; }
+#preview {
+  width:100%;
+  aspect-ratio: 16 / 10;
+  object-fit:cover;
+  display:none;
+  border-radius: 10px;
+}
+#preview.is-ready { display:block; }
 .actions {
   margin-top:12px;
   display:grid;
