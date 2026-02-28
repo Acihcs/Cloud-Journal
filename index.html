@@ -43,7 +43,7 @@
           <button id="writeWithWeatherBtn" class="btn ghost" disabled>写点想法</button>
         </div>
 
-        <div id="result" class="result" hidden></div>
+        <div id="result" class="result" aria-live="polite" hidden></div>
         <canvas id="analysisCanvas" hidden></canvas>
       </section>
 
@@ -58,6 +58,7 @@
       <section class="card">
         <div class="row between">
           <h3>笔记</h3>
+          <label for="searchInput" class="sr-only">搜索笔记</label>
           <input id="searchInput" class="search" placeholder="搜索标题或内容..." />
         </div>
         <div id="notesList" class="list"></div>

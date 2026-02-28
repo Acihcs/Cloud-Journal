@@ -83,7 +83,13 @@ function analyzeImage(img) {
 
 function renderHero() {
   const latest = state.weatherRecords[0];
-  if (!latest) return;
+  if (!latest) {
+    $('heroIcon').textContent = '☁️';
+    $('heroTitle').textContent = '等待观测';
+    $('heroDesc').textContent = '拍一张天空，开始今天的观云记录';
+    $('heroTip').textContent = '建议：先拍照识别，再记录当下想法 🌿';
+    return;
+  }
   const w = WEATHER[latest.type];
   $('heroIcon').textContent = w.icon;
   $('heroTitle').textContent = `${w.label} · ${latest.confidence}%`;
@@ -191,10 +197,18 @@ function setup() {
     $('analyzeBtn').disabled = false;
   });
 
-  $('analyzeBtn').addEventListener('click', () => {
+  $('analyzeBtn').addEventListener('click', async () => {
     if (preview.hidden) return;
+
+    const analyzeBtn = $('analyzeBtn');
+    analyzeBtn.disabled = true;
+    const prevText = analyzeBtn.textContent;
+    analyzeBtn.textContent = '识别中...';
+
+    await new Promise(r => setTimeout(r, 350));
     const result = analyzeImage(preview);
     state.pendingResult = result;
+
     const w = WEATHER[result.type];
     $('result').hidden = false;
     $('result').innerHTML = `
@@ -203,8 +217,11 @@ function setup() {
       判断：${w.desc}<br>
       建议：${w.tip}
     `;
+
     $('saveWeatherBtn').disabled = false;
     $('writeWithWeatherBtn').disabled = false;
+    analyzeBtn.textContent = prevText;
+    analyzeBtn.disabled = false;
   });
 
   $('saveWeatherBtn').addEventListener('click', () => {
