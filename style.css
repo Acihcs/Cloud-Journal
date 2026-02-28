@@ -85,7 +85,12 @@ strong { font-weight: 600; }
 #uploadHint { color: var(--muted); font-size: .95rem; line-height: 1.55; }
 .upload-hint { display:grid; gap:6px; place-items:center; width:100%; }
 .upload-hint[hidden],
-.uploader.has-image .upload-hint { display:none !important; }
+.uploader.has-image .upload-hint {
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
 .upload-icon { font-size: 1.35rem; opacity: .75; line-height: 1; }
 .upload-text { color: #3f6686; font-weight: 500; }
 .upload-sub { font-size: .78rem; color: var(--muted); }

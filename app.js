@@ -267,6 +267,7 @@ function setup() {
   preview.hidden = true;
   preview.removeAttribute('src');
   hint.hidden = false;
+  hint.style.display = 'grid';
   uploader.classList.remove('has-image');
   let objectUrl = null;
 
@@ -279,6 +280,7 @@ function setup() {
     preview.hidden = false;
     preview.classList.add('is-ready');
     hint.hidden = true;
+    hint.style.display = 'none';
     uploader.classList.add('has-image');
     $('analyzeBtn').disabled = false;
   });
