@@ -95,20 +95,24 @@ function analyzeImage(img) {
   return { type, confidence, stats: { darkR, brightR, grayR, blueR } };
 }
 
-function renderHero() {
-  const latest = state.weatherRecords[0];
-  if (!latest) {
-    $('heroIcon').innerHTML = weatherIcon('default', 'hero-weather-icon');
-    $('heroTitle').textContent = '等待观测';
-    $('heroDesc').textContent = '拍一张天空，开始今天的观云记录';
-    $('heroTip').textContent = '建议：先拍照识别，再记录当下想法。';
+function renderRecognizerStatus() {
+  const statusEl = $('recognizerStatus');
+  if (!statusEl) return;
+
+  if (state.pendingResult) {
+    const w = WEATHER[state.pendingResult.type];
+    statusEl.textContent = `状态：已识别为「${w.label}」（${state.pendingResult.confidence}%）。可保存观测或写关联笔记。`;
     return;
   }
+
+  const latest = state.weatherRecords[0];
+  if (!latest) {
+    statusEl.textContent = '状态：等待观测。先上传天空照片再开始识别。';
+    return;
+  }
+
   const w = WEATHER[latest.type];
-  $('heroIcon').innerHTML = weatherIcon(latest.type, 'hero-weather-icon');
-  $('heroTitle').textContent = `${w.label} · ${latest.confidence}%`;
-  $('heroDesc').textContent = `${w.desc}（${fmt(latest.ts)}）`;
-  $('heroTip').textContent = `建议：${w.tip}`;
+  statusEl.textContent = `状态：上次观测「${w.label}」（${latest.confidence}%），时间 ${fmt(latest.ts)}。`;
 }
 
 function renderWeatherTrend() {
@@ -204,7 +208,7 @@ function renderNotes() {
 }
 
 function renderAll() {
-  renderHero();
+  renderRecognizerStatus();
   renderWeatherList();
   renderNotes();
 }
@@ -282,7 +286,12 @@ function setup() {
     hint.hidden = true;
     hint.style.display = 'none';
     uploader.classList.add('has-image');
+    state.pendingResult = null;
+    $('result').hidden = true;
+    $('saveWeatherBtn').disabled = true;
+    $('writeWithWeatherBtn').disabled = true;
     $('analyzeBtn').disabled = false;
+    renderRecognizerStatus();
   });
 
   $('analyzeBtn').addEventListener('click', async () => {
@@ -308,6 +317,7 @@ function setup() {
 
     $('saveWeatherBtn').disabled = false;
     $('writeWithWeatherBtn').disabled = false;
+    renderRecognizerStatus();
     analyzeBtn.textContent = prevText;
     analyzeBtn.disabled = false;
   });
@@ -315,9 +325,14 @@ function setup() {
   $('saveWeatherBtn').addEventListener('click', () => {
     if (!state.pendingResult) return;
     state.weatherRecords.unshift({ id: uid(), ...state.pendingResult, ts: Date.now() });
+    state.pendingResult = null;
     save();
-    renderHero();
+    renderRecognizerStatus();
     renderWeatherList();
+    const btn = $('saveWeatherBtn');
+    const old = btn.textContent;
+    btn.textContent = '已保存 ✓';
+    setTimeout(() => { btn.textContent = old; }, 1200);
   });
 
   $('writeWithWeatherBtn').addEventListener('click', () => {

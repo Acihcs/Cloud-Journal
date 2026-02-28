@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#d9eef9" />
   <title>观云记</title>
-  <link rel="stylesheet" href="./style.css?v=20260228-1225" />
+  <link rel="stylesheet" href="./style.css?v=20260228-1240" />
 </head>
 <body>
   <div class="app">
@@ -14,29 +14,20 @@
         <h1>观云记</h1>
         <p id="todayText" class="muted"></p>
       </div>
-      <button id="newNoteQuick" class="btn ghost">新建笔记</button>
+      <button id="newNoteQuick" class="btn ghost">随手记</button>
     </header>
 
     <main>
-      <section class="card hero" id="heroCard">
-        <div class="hero-main">
-          <div id="heroIcon" class="icon" aria-hidden="true"></div>
-          <div>
-            <h2 id="heroTitle">等待观测</h2>
-            <p id="heroDesc" class="muted">拍一张天空，开始今天的观云记录</p>
-          </div>
-        </div>
-        <p id="heroTip" class="tip">建议：先拍照识别，再记录当下想法 🌿</p>
-      </section>
-
       <section class="card">
         <h3>观云识别</h3>
+        <p id="recognizerStatus" class="tip">状态：等待观测。先上传天空照片再开始识别。</p>
         <label for="photoInput" class="uploader" id="uploader">
           <img id="preview" alt="" hidden onerror="this.hidden=true;this.classList.remove('is-ready');" />
           <div id="uploadHint" class="upload-hint">
             <div class="upload-icon" aria-hidden="true">☁️</div>
             <div class="upload-text">点击上传 / 拍摄天空照片</div>
             <div class="upload-sub">建议拍摄天空占画面 70% 以上</div>
+            <div class="upload-badge" aria-hidden="true">＋ 拍照</div>
           </div>
         </label>
         <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
@@ -44,7 +35,7 @@
         <div class="actions">
           <button id="analyzeBtn" class="btn" disabled>开始识别</button>
           <button id="saveWeatherBtn" class="btn ghost" disabled>保存观测</button>
-          <button id="writeWithWeatherBtn" class="btn ghost" disabled>写点想法</button>
+          <button id="writeWithWeatherBtn" class="btn ghost" disabled>关联笔记</button>
         </div>
 
         <div id="result" class="result" aria-live="polite" hidden></div>
@@ -86,6 +77,6 @@
     </form>
   </dialog>
 
-  <script src="./app.js?v=20260228-1225"></script>
+  <script src="./app.js?v=20260228-1240"></script>
 </body>
 </html>
