@@ -82,7 +82,12 @@ strong { font-weight: 600; }
   padding: 14px;
 }
 #uploadHint { color: var(--muted); font-size: .95rem; line-height: 1.55; }
+.upload-hint { display:grid; gap:6px; place-items:center; }
+.upload-icon { font-size: 1.35rem; opacity: .75; line-height: 1; }
+.upload-text { color: #3f6686; font-weight: 500; }
+.upload-sub { font-size: .78rem; color: var(--muted); }
 #preview { width:100%; aspect-ratio: 16 / 10; object-fit:cover; display:block; border-radius: 10px; }
+#preview[hidden] { display: none !important; }
 .actions {
   margin-top:12px;
   display:grid;

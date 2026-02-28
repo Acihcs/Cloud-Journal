@@ -33,7 +33,11 @@
         <h3>观云识别</h3>
         <label for="photoInput" class="uploader" id="uploader">
           <img id="preview" alt="预览" hidden />
-          <div id="uploadHint">点击上传 / 拍摄天空照片</div>
+          <div id="uploadHint" class="upload-hint">
+            <div class="upload-icon" aria-hidden="true">☁️</div>
+            <div class="upload-text">点击上传 / 拍摄天空照片</div>
+            <div class="upload-sub">建议拍摄天空占画面 70% 以上</div>
+          </div>
         </label>
         <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
 
