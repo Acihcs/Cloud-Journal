@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#d9eef9" />
   <title>观云记</title>
-  <link rel="stylesheet" href="./style.css?v=20260228-1240" />
+  <link rel="stylesheet" href="./style.css?v=20260228-1310" />
 </head>
 <body>
   <div class="app">
@@ -32,13 +32,20 @@
         </label>
         <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
 
+        <div id="processingLayer" class="processing-layer" hidden>
+          <div class="scan-line"></div>
+          <div class="processing-cloud">☁️</div>
+        </div>
+        <p id="processingText" class="processing-text" hidden>正在云层中寻找线索...</p>
+
         <div class="actions">
           <button id="analyzeBtn" class="btn" disabled>开始识别</button>
           <button id="saveWeatherBtn" class="btn ghost" disabled>保存观测</button>
-          <button id="writeWithWeatherBtn" class="btn ghost" disabled>关联笔记</button>
+          <button id="writeWithWeatherBtn" class="btn" disabled>写点想法</button>
         </div>
 
         <div id="result" class="result" aria-live="polite" hidden></div>
+        <button id="retryBtn" class="btn ghost" hidden>重新拍摄/上传</button>
         <canvas id="analysisCanvas" hidden></canvas>
       </section>
 
@@ -77,6 +84,6 @@
     </form>
   </dialog>
 
-  <script src="./app.js?v=20260228-1240"></script>
+  <script src="./app.js?v=20260228-1310"></script>
 </body>
 </html>

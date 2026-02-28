@@ -17,6 +17,20 @@ const WEATHER_ICONS = {
   default: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.5 18H7.2a3.7 3.7 0 1 1 .4-7.4A5.5 5.5 0 0 1 18 13a2.5 2.5 0 1 1 .5 5Z" fill="currentColor"/></svg>'
 };
 
+const CLOUD_COPY = {
+  sunny: { name: '卷积云', meaning: '天气趋于稳定，短时降雨概率较低。', poetry: '高空的亮白云团，是晴天写下的信。' },
+  partly: { name: '淡积云', meaning: '云量适中，体感较舒适。', poetry: '风把云轻轻推开，天空留了半页空白。' },
+  cloudy: { name: '层积云', meaning: '云层较厚，日照减弱。', poetry: '云把光揉软了，世界就慢了下来。' },
+  overcast: { name: '雨层云', meaning: '阴天明显，后续可能出现降水。', poetry: '灰色天幕落下前，云先把故事讲完。' },
+  rainy: { name: '积雨云', meaning: '对流活跃，短时降雨概率较高。', poetry: '乌云压低时，雨声就在路上。' }
+};
+
+const PROCESSING_LINES = [
+  '正在云层中寻找线索...',
+  '测算风的轨迹...',
+  '快看，是一朵罕见的云吗？'
+];
+
 const KEY = {
   weather: 'cloud_journal_weather',
   notes: 'cloud_journal_notes'
@@ -33,6 +47,9 @@ const state = {
 const $ = (id) => document.getElementById(id);
 const esc = (s = '') => String(s).replace(/[&<>\"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
 const fmt = (ts) => new Date(ts).toLocaleString('zh-CN', { hour12: false });
+
+let processingTimer = null;
+let processingIndex = 0;
 
 function weatherIcon(type, className = '') {
   const svg = WEATHER_ICONS[type] || WEATHER_ICONS.default;
@@ -54,6 +71,32 @@ function load() {
 function save() {
   localStorage.setItem(KEY.weather, JSON.stringify(state.weatherRecords));
   localStorage.setItem(KEY.notes, JSON.stringify(state.notes));
+}
+
+function startProcessingUI() {
+  const layer = $('processingLayer');
+  const text = $('processingText');
+  layer.hidden = false;
+  text.hidden = false;
+  processingIndex = 0;
+  text.textContent = PROCESSING_LINES[processingIndex];
+  clearInterval(processingTimer);
+  processingTimer = setInterval(() => {
+    processingIndex = (processingIndex + 1) % PROCESSING_LINES.length;
+    text.textContent = PROCESSING_LINES[processingIndex];
+  }, 950);
+}
+
+function stopProcessingUI() {
+  clearInterval(processingTimer);
+  processingTimer = null;
+  $('processingLayer').hidden = true;
+  $('processingText').hidden = true;
+}
+
+function isProbablySky(stats) {
+  const { blueR, grayR, brightR, darkR } = stats;
+  return (blueR > 0.06 || grayR > 0.2) && (brightR > 0.06 || darkR > 0.08);
 }
 
 function analyzeImage(img) {
@@ -287,7 +330,9 @@ function setup() {
     hint.style.display = 'none';
     uploader.classList.add('has-image');
     state.pendingResult = null;
+    stopProcessingUI();
     $('result').hidden = true;
+    $('retryBtn').hidden = true;
     $('saveWeatherBtn').disabled = true;
     $('writeWithWeatherBtn').disabled = true;
     $('analyzeBtn').disabled = false;
@@ -298,21 +343,43 @@ function setup() {
     if (preview.hidden || !preview.classList.contains('is-ready')) return;
 
     const analyzeBtn = $('analyzeBtn');
+    const retryBtn = $('retryBtn');
     analyzeBtn.disabled = true;
     const prevText = analyzeBtn.textContent;
     analyzeBtn.textContent = '识别中...';
+    retryBtn.hidden = true;
 
-    await new Promise(r => setTimeout(r, 350));
+    startProcessingUI();
+    await new Promise(r => setTimeout(r, 1450));
     const result = analyzeImage(preview);
-    state.pendingResult = result;
+    stopProcessingUI();
 
+    if (!isProbablySky(result.stats)) {
+      state.pendingResult = null;
+      $('result').hidden = false;
+      $('result').innerHTML = `
+        <strong>哎呀，这好像不是天空呢。</strong><br>
+        云朵信息不足，暂时无法可靠识别。<br>
+        建议：对准天空区域重拍（天空占画面 70%+）。
+      `;
+      $('saveWeatherBtn').disabled = true;
+      $('writeWithWeatherBtn').disabled = true;
+      retryBtn.hidden = false;
+      renderRecognizerStatus();
+      analyzeBtn.textContent = prevText;
+      analyzeBtn.disabled = false;
+      return;
+    }
+
+    state.pendingResult = result;
     const w = WEATHER[result.type];
+    const c = CLOUD_COPY[result.type];
     $('result').hidden = false;
     $('result').innerHTML = `
-      <strong>${weatherIcon(result.type, 'inline-weather-icon')} ${w.label}</strong><br>
-      置信度：${result.confidence}%<br>
-      判断：${w.desc}<br>
-      建议：${w.tip}
+      <strong>${weatherIcon(result.type, 'inline-weather-icon')} ${c.name}</strong><br>
+      天气含义：${c.meaning}<br>
+      识别置信度：${result.confidence}%<br>
+      云语：${c.poetry}
     `;
 
     $('saveWeatherBtn').disabled = false;
@@ -340,6 +407,7 @@ function setup() {
     openNoteDialog(null, wt);
   });
 
+  $('retryBtn').addEventListener('click', () => input.click());
   $('newNoteQuick').addEventListener('click', () => openNoteDialog());
   $('saveNote').addEventListener('click', saveNote);
   $('cancelNote').addEventListener('click', () => $('noteDialog').close());
