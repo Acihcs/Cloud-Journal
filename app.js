@@ -262,10 +262,12 @@ function setup() {
   const input = $('photoInput');
   const preview = $('preview');
   const hint = $('uploadHint');
+  const uploader = $('uploader');
   preview.classList.remove('is-ready');
   preview.hidden = true;
   preview.removeAttribute('src');
   hint.hidden = false;
+  uploader.classList.remove('has-image');
   let objectUrl = null;
 
   input.addEventListener('change', () => {
@@ -277,6 +279,7 @@ function setup() {
     preview.hidden = false;
     preview.classList.add('is-ready');
     hint.hidden = true;
+    uploader.classList.add('has-image');
     $('analyzeBtn').disabled = false;
   });
 
