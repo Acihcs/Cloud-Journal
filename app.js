@@ -126,7 +126,6 @@ function resetRecognitionFlow() {
   $('analyzeBtn').disabled = true;
   $('analyzeBtn').textContent = '开始识别';
   $('cancelAnalyzeBtn').hidden = true;
-  $('clearPhotoBtn').hidden = true;
 
   renderRecognizerStatus();
 }
@@ -347,7 +346,6 @@ function setup() {
   const preview = $('preview');
   const hint = $('uploadHint');
   const uploader = $('uploader');
-  const clearPhotoBtn = $('clearPhotoBtn');
   preview.classList.remove('is-ready');
   preview.hidden = true;
   preview.removeAttribute('src');
@@ -373,7 +371,6 @@ function setup() {
     $('writeWithWeatherBtn').disabled = true;
     $('analyzeBtn').disabled = false;
     $('cancelAnalyzeBtn').hidden = false;
-    $('clearPhotoBtn').hidden = false;
     renderRecognizerStatus();
   });
 
@@ -447,14 +444,6 @@ function setup() {
   $('writeWithWeatherBtn').addEventListener('click', () => {
     const wt = state.pendingResult?.type || null;
     openNoteDialog(null, wt);
-  });
-
-  clearPhotoBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    resetRecognitionFlow();
-    const statusEl = $('recognizerStatus');
-    if (statusEl) statusEl.textContent = '状态：已清空当前图片，请重新拍摄或上传天空照片。';
   });
 
   $('retryBtn').addEventListener('click', () => input.click());
