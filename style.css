@@ -45,12 +45,12 @@ h1 { margin:0; font-size: 1.4rem; line-height: 1.2; letter-spacing: .01em; }
 .muted { color: var(--muted); font-size:.9rem; margin:4px 0 0; }
 main { display:grid; gap:14px; }
 .card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 14px;
+  background: rgba(247, 250, 252, .92);
+  border: 1px solid rgba(198, 214, 227, .45);
+  border-radius: 20px;
+  padding: 16px;
   backdrop-filter: blur(8px);
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 4px 12px rgba(29, 73, 109, .06);
   transition: box-shadow .22s ease, transform .22s ease;
 }
 .hero {
@@ -69,18 +69,23 @@ h3 { font-size: 1rem; }
 strong { font-weight: 600; }
 .tip { margin:8px 0 0; font-size:.9rem; color:#4f7692; }
 .uploader {
-  border:1.5px dashed var(--line);
-  border-radius:12px;
-  min-height:186px;
+  border: 2px dashed #b8c3cc;
+  border-radius: 18px;
+  min-height: 186px;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  background: rgba(255,255,255,.56);
+  background: #edf0f2;
   overflow:hidden;
   cursor:pointer;
   padding: 14px;
   position: relative;
+}
+.uploader.has-image {
+  border-style: solid;
+  border-color: #5e6f73;
+  background: #e9edef;
 }
 #uploadHint { color: var(--muted); font-size: .95rem; line-height: 1.55; }
 .upload-hint { display:grid; gap:6px; place-items:center; width:100%; }
@@ -108,9 +113,33 @@ strong { font-weight: 600; }
   aspect-ratio: 16 / 10;
   object-fit:cover;
   display:none;
-  border-radius: 10px;
+  border-radius: 14px;
 }
 #preview.is-ready { display:block; }
+.clear-photo-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 2px solid #5e6f73;
+  background: rgba(245, 248, 250, .95);
+  color: #44585d;
+  font-size: 20px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 3;
+  padding: 0;
+  box-shadow: none;
+}
+.clear-photo-btn:hover { background: #ffffff; }
+.clear-photo-btn:focus-visible {
+  outline: 2px solid #5aa1ef;
+  outline-offset: 2px;
+}
 .processing-layer {
   position: absolute;
   inset: 14px;
@@ -157,6 +186,10 @@ strong { font-weight: 600; }
 }
 #analyzeBtn { grid-column: 1 / -1; }
 #retryBtn { width: 100%; margin-top: 8px; }
+#cancelAnalyzeBtn {
+  width: 100%;
+  margin-top: 6px;
+}
 .btn {
   border:none; background: var(--primary); color:#fff; padding:10px 14px;
   border-radius:10px; cursor:pointer; min-height:44px;
@@ -173,6 +206,15 @@ strong { font-weight: 600; }
 }
 .btn.ghost:hover:not(:disabled) {
   background: rgba(255,255,255,.92);
+}
+.btn.danger {
+  background: #f8dede;
+  color: #8e3f3f;
+  border: 1px solid #efbcbc;
+  box-shadow: none;
+}
+.btn.danger:hover:not(:disabled) {
+  background: #f6d3d3;
 }
 .btn:disabled {
   opacity:1;

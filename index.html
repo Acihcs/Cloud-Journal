@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#d9eef9" />
   <title>观云记</title>
-  <link rel="stylesheet" href="./style.css?v=20260228-1310" />
+  <link rel="stylesheet" href="./style.css?v=20260228-1505" />
 </head>
 <body>
   <div class="app">
@@ -22,6 +22,7 @@
         <h3>观云识别</h3>
         <p id="recognizerStatus" class="tip">状态：等待观测。先上传天空照片再开始识别。</p>
         <label for="photoInput" class="uploader" id="uploader">
+          <button id="clearPhotoBtn" class="clear-photo-btn" type="button" hidden aria-label="清空当前图片">×</button>
           <img id="preview" alt="" hidden onerror="this.hidden=true;this.classList.remove('is-ready');" />
           <div id="uploadHint" class="upload-hint">
             <div class="upload-icon" aria-hidden="true">☁️</div>
@@ -37,6 +38,7 @@
           <div class="processing-cloud">☁️</div>
         </div>
         <p id="processingText" class="processing-text" hidden>正在云层中寻找线索...</p>
+        <button id="cancelAnalyzeBtn" class="btn danger" hidden>取消识别</button>
 
         <div class="actions">
           <button id="analyzeBtn" class="btn" disabled>开始识别</button>
@@ -84,6 +86,6 @@
     </form>
   </dialog>
 
-  <script src="./app.js?v=20260228-1310"></script>
+  <script src="./app.js?v=20260228-1505"></script>
 </body>
 </html>
