@@ -263,6 +263,7 @@ function setup() {
   const preview = $('preview');
   const hint = $('uploadHint');
   preview.classList.remove('is-ready');
+  preview.hidden = true;
   preview.removeAttribute('src');
   hint.hidden = false;
   let objectUrl = null;
@@ -273,13 +274,14 @@ function setup() {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     objectUrl = URL.createObjectURL(file);
     preview.src = objectUrl;
+    preview.hidden = false;
     preview.classList.add('is-ready');
     hint.hidden = true;
     $('analyzeBtn').disabled = false;
   });
 
   $('analyzeBtn').addEventListener('click', async () => {
-    if (!preview.classList.contains('is-ready')) return;
+    if (preview.hidden || !preview.classList.contains('is-ready')) return;
 
     const analyzeBtn = $('analyzeBtn');
     analyzeBtn.disabled = true;
