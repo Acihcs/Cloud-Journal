@@ -1,289 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-    <meta name="description" content="观云记 — 拍摄天空，识别云层天气，记录此刻的美好想法" />
-    <meta name="theme-color" content="#C5E8FA" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>观云记</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="theme-color" content="#d9eef9" />
+  <title>观云记</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
-
 <body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <h1>观云记</h1>
+        <p id="todayText" class="muted"></p>
+      </div>
+      <button id="newNoteQuick" class="btn ghost">新建笔记</button>
+    </header>
 
-    <!-- 背景云朵装饰 -->
-    <div class="bg-clouds" aria-hidden="true">
-        <div class="cloud cloud-1"></div>
-        <div class="cloud cloud-2"></div>
-        <div class="cloud cloud-3"></div>
-    </div>
-
-    <!-- 应用外壳 -->
-    <div class="app-shell">
-
-        <!-- ===== 顶部栏 ===== -->
-        <header class="app-header">
-            <div class="header-left">
-                <h1 class="app-title">观云记</h1>
-                <p class="app-date" id="headerDate"></p>
-            </div>
-            <div class="header-right">
-                <button class="icon-btn" id="settingsBtn" aria-label="设置" title="设置">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <circle cx="12" cy="12" r="3" />
-                        <path
-                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                    </svg>
-                </button>
-            </div>
-        </header>
-
-        <!-- ===== 视图容器 ===== -->
-        <main class="views-container">
-
-            <!-- ——— 视图一：首页仪表盘 ——— -->
-            <section class="view active" id="viewHome">
-
-                <!-- 今日天气大卡片 -->
-                <div class="weather-hero-card glass-card">
-                    <div class="weather-hero-bg" id="heroWeatherBg"></div>
-                    <div class="weather-hero-content">
-                        <div class="weather-hero-icon" id="heroIcon">
-                            <svg class="weather-svg sunny" viewBox="0 0 80 80" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="40" cy="40" r="18" fill="#FFD87A" opacity="0.9" />
-                                <g stroke="#FFD87A" stroke-width="3" stroke-linecap="round" opacity="0.7">
-                                    <line x1="40" y1="8" x2="40" y2="16" />
-                                    <line x1="40" y1="64" x2="40" y2="72" />
-                                    <line x1="8" y1="40" x2="16" y2="40" />
-                                    <line x1="64" y1="40" x2="72" y2="40" />
-                                    <line x1="16.7" y1="16.7" x2="22.3" y2="22.3" />
-                                    <line x1="57.7" y1="57.7" x2="63.3" y2="63.3" />
-                                    <line x1="63.3" y1="16.7" x2="57.7" y2="22.3" />
-                                    <line x1="22.3" y1="57.7" x2="16.7" y2="63.3" />
-                                </g>
-                            </svg>
-                        </div>
-                        <div class="weather-hero-info">
-                            <p class="weather-condition" id="heroCondition">等待观测</p>
-                            <p class="weather-desc" id="heroDesc">拍一张天空，让我来判断今天的天气</p>
-                            <p class="weather-time" id="heroTime"></p>
-                        </div>
-                    </div>
-                    <div class="weather-suggestion" id="heroSuggestion">
-                        <span class="suggestion-icon">💡</span>
-                        <span id="suggestionText">点击下方"观云"开始拍摄</span>
-                    </div>
-                </div>
-
-                <!-- 天气历史记录 -->
-                <div class="section-header">
-                    <h2 class="section-title">观测记录</h2>
-                    <span class="section-sub" id="recordCount">暂无记录</span>
-                </div>
-                <div class="weather-history" id="weatherHistory">
-                    <div class="empty-state">
-                        <div class="empty-icon">☁️</div>
-                        <p>还没有观测记录</p>
-                        <p class="empty-sub">拍摄天空开始你的第一次观测</p>
-                    </div>
-                </div>
-
-                <!-- 最近笔记预览 -->
-                <div class="section-header">
-                    <h2 class="section-title">最近笔记</h2>
-                    <button class="text-btn" id="viewAllNotes">查看全部 →</button>
-                </div>
-                <div class="notes-preview" id="notesPreview">
-                    <div class="empty-state">
-                        <div class="empty-icon">📝</div>
-                        <p>还没有笔记</p>
-                        <p class="empty-sub">点击下方"笔记"记录你的想法</p>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- ——— 视图二：云层识别 ——— -->
-            <section class="view" id="viewCloud">
-
-                <div class="section-header" style="margin-top:0">
-                    <h2 class="section-title">观云识天</h2>
-                    <p class="section-sub">拍摄或上传天空照片</p>
-                </div>
-
-                <!-- 相机区域 -->
-                <div class="camera-zone glass-card" id="cameraZone">
-                    <div class="camera-preview" id="cameraPreview">
-                        <div class="camera-placeholder" id="cameraPlaceholder">
-                            <div class="camera-inner">
-                                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="56"
-                                    height="56">
-                                    <path d="M32 20C25.4 20 20 25.4 20 32s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z"
-                                        fill="#B8D4E8" opacity="0.6" />
-                                    <path
-                                        d="M22 12h20l4 6H56a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4h10l4-6z"
-                                        stroke="#8BB5D0" stroke-width="2.5" stroke-linejoin="round" />
-                                    <circle cx="32" cy="32" r="10" stroke="#8BB5D0" stroke-width="2.5" />
-                                </svg>
-                                <p class="camera-hint">点击拍摄天空</p>
-                                <p class="camera-sub">或将图片拖拽到此处</p>
-                            </div>
-                        </div>
-                        <img id="previewImg" src="" alt="天空预览" style="display:none;" />
-                        <canvas id="analysisCanvas" style="display:none;"></canvas>
-                    </div>
-
-                    <div class="camera-actions">
-                        <label class="btn btn-primary" for="photoInput" id="captureLabel">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path
-                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                                <circle cx="12" cy="13" r="4" />
-                            </svg>
-                            拍摄 / 上传
-                        </label>
-                        <input type="file" id="photoInput" accept="image/*" capture="environment"
-                            style="display:none;" />
-                        <button class="btn btn-ghost" id="analyzeBtn" disabled>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                                <polyline points="22 4 12 14.01 9 11.01" />
-                            </svg>
-                            开始识别
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 结果卡片 -->
-                <div class="result-card glass-card" id="resultCard" style="display:none;">
-                    <div class="result-header">
-                        <div class="result-icon" id="resultIcon">☁️</div>
-                        <div class="result-meta">
-                            <h3 class="result-condition" id="resultCondition"></h3>
-                            <p class="result-confidence" id="resultConfidence"></p>
-                        </div>
-                    </div>
-                    <div class="result-details" id="resultDetails"></div>
-                    <div class="result-suggestion" id="resultSugg"></div>
-                    <div class="result-actions">
-                        <button class="btn btn-primary" id="saveWeatherBtn">💾 保存记录</button>
-                        <button class="btn btn-ghost" id="addNoteFromWeather">📝 附加笔记</button>
-                    </div>
-                </div>
-
-                <!-- 识别中动画 -->
-                <div class="analyzing-overlay" id="analyzingOverlay" style="display:none;">
-                    <div class="analyzing-spinner">
-                        <div class="spin-ring"></div>
-                        <div class="spin-ring-2"></div>
-                        <div class="spin-cloud">☁️</div>
-                    </div>
-                    <p class="analyzing-text">正在分析云层...</p>
-                </div>
-
-            </section>
-
-            <!-- ——— 视图三：笔记 ——— -->
-            <section class="view" id="viewNotes">
-
-                <!-- 笔记列表 -->
-                <div class="notes-toolbar">
-                    <div class="search-bar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        <input type="text" id="searchInput" placeholder="搜索笔记..." />
-                    </div>
-                    <button class="btn btn-primary btn-sm" id="newNoteBtn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        新建
-                    </button>
-                </div>
-
-                <div class="notes-list" id="notesList">
-                    <div class="empty-state">
-                        <div class="empty-icon">🌿</div>
-                        <p>笔记本还是空的</p>
-                        <p class="empty-sub">记录此刻的想法与感悟</p>
-                    </div>
-                </div>
-
-            </section>
-
-        </main>
-
-        <!-- ===== 底部导航 ===== -->
-        <nav class="bottom-nav">
-            <button class="nav-btn active" data-view="viewHome" id="navHome">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-                <span>主页</span>
-            </button>
-            <button class="nav-btn" data-view="viewCloud" id="navCloud">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
-                </svg>
-                <span>观云</span>
-            </button>
-            <button class="nav-btn" data-view="viewNotes" id="navNotes">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <line x1="16" y1="13" x2="8" y2="13" />
-                    <line x1="16" y1="17" x2="8" y2="17" />
-                    <polyline points="10 9 9 9 8 9" />
-                </svg>
-                <span>笔记</span>
-            </button>
-        </nav>
-
-    </div>
-
-    <!-- ===== 笔记编辑器弹窗 ===== -->
-    <div class="modal-overlay" id="noteModal" style="display:none;">
-        <div class="modal-card glass-card">
-            <div class="modal-header">
-                <input type="text" class="note-title-input" id="noteTitleInput" placeholder="笔记标题（可选）" maxlength="50" />
-                <button class="icon-btn modal-close" id="closeNoteModal" aria-label="关闭">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-weather-tag" id="modalWeatherTag" style="display:none;">
-                <span id="modalWeatherIcon"></span>
-                <span id="modalWeatherLabel"></span>
-            </div>
-            <textarea class="note-editor" id="noteEditor" placeholder="此刻，你想说些什么…" rows="12"></textarea>
-            <div class="modal-footer">
-                <span class="char-count" id="charCount">0 字</span>
-                <div class="modal-actions">
-                    <button class="btn btn-ghost btn-sm" id="deleteNoteBtn"
-                        style="display:none; color:#E57373;">删除</button>
-                    <button class="btn btn-primary" id="saveNoteBtn">保存笔记</button>
-                </div>
-            </div>
+    <main>
+      <section class="card hero" id="heroCard">
+        <div class="hero-main">
+          <div id="heroIcon" class="icon">☁️</div>
+          <div>
+            <h2 id="heroTitle">等待观测</h2>
+            <p id="heroDesc" class="muted">拍一张天空，开始今天的观云记录</p>
+          </div>
         </div>
-    </div>
+        <p id="heroTip" class="tip">建议：先拍照识别，再记录当下想法 🌿</p>
+      </section>
 
-    <script src="app.js"></script>
+      <section class="card">
+        <h3>观云识别</h3>
+        <label for="photoInput" class="uploader" id="uploader">
+          <img id="preview" alt="预览" hidden />
+          <div id="uploadHint">点击上传 / 拍摄天空照片</div>
+        </label>
+        <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
+
+        <div class="actions">
+          <button id="analyzeBtn" class="btn" disabled>开始识别</button>
+          <button id="saveWeatherBtn" class="btn ghost" disabled>保存观测</button>
+          <button id="writeWithWeatherBtn" class="btn ghost" disabled>写点想法</button>
+        </div>
+
+        <div id="result" class="result" hidden></div>
+        <canvas id="analysisCanvas" hidden></canvas>
+      </section>
+
+      <section class="card">
+        <div class="row between">
+          <h3>观测记录</h3>
+          <span class="muted" id="weatherCount">0 条</span>
+        </div>
+        <div id="weatherList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <div class="row between">
+          <h3>笔记</h3>
+          <input id="searchInput" class="search" placeholder="搜索标题或内容..." />
+        </div>
+        <div id="notesList" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="noteDialog">
+    <form method="dialog" class="dialog-body">
+      <h3 id="dialogTitle">新建笔记</h3>
+      <input id="noteTitle" placeholder="标题（可选）" maxlength="50" />
+      <textarea id="noteContent" rows="8" placeholder="记下此刻的想法..." required></textarea>
+      <p id="noteWeatherHint" class="muted"></p>
+      <div class="row end gap">
+        <button value="cancel" class="btn ghost" type="button" id="cancelNote">取消</button>
+        <button value="save" class="btn" type="button" id="saveNote">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
 </body>
-
 </html>
