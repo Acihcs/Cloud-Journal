@@ -262,6 +262,9 @@ function setup() {
   const input = $('photoInput');
   const preview = $('preview');
   const hint = $('uploadHint');
+  preview.hidden = true;
+  preview.removeAttribute('src');
+  hint.hidden = false;
   let objectUrl = null;
 
   input.addEventListener('change', () => {
