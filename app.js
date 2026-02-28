@@ -112,13 +112,18 @@ function renderHero() {
 }
 
 function renderWeatherTrend() {
+  const summaryEl = $('weatherSummary');
   const trendEl = $('weatherTrend');
+  const dailyEl = $('weatherDailyTrend');
   const now = Date.now();
-  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const oneDay = 24 * 60 * 60 * 1000;
+  const sevenDaysAgo = now - 7 * oneDay;
   const recent = state.weatherRecords.filter(r => r.ts >= sevenDaysAgo);
 
   if (recent.length === 0) {
+    summaryEl.innerHTML = '';
     trendEl.innerHTML = '<p class="trend-empty">近7天暂无观测数据。</p>';
+    dailyEl.innerHTML = '';
     return;
   }
 
@@ -129,14 +134,42 @@ function renderWeatherTrend() {
     count: recent.filter(r => r.type === type).length
   })).filter(x => x.count > 0);
 
-  const maxCount = Math.max(...counts.map(c => c.count), 1);
+  const most = counts.reduce((a, b) => (a.count >= b.count ? a : b));
+  summaryEl.innerHTML = `
+    <span class="summary-chip">近7天观测：${recent.length} 次</span>
+    <span class="summary-chip">最常见：${weatherIcon(most.type, 'inline-weather-icon')} ${most.label}</span>
+  `;
 
+  const maxCount = Math.max(...counts.map(c => c.count), 1);
   trendEl.innerHTML = counts.map(c => {
     const width = Math.max(8, Math.round((c.count / maxCount) * 100));
     return `<div class="trend-row">
       <div class="trend-label">${weatherIcon(c.type, 'inline-weather-icon')} ${c.label}</div>
       <div class="trend-track"><div class="trend-fill" style="width:${width}%"></div></div>
       <div class="meta">${c.count}</div>
+    </div>`;
+  }).join('');
+
+  const dayBuckets = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now - i * oneDay);
+    const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    dayBuckets.push({
+      key,
+      label: `${d.getMonth()+1}/${d.getDate()}`,
+      count: recent.filter(r => {
+        const t = new Date(r.ts);
+        return `${t.getFullYear()}-${t.getMonth()+1}-${t.getDate()}` === key;
+      }).length
+    });
+  }
+  const maxDay = Math.max(...dayBuckets.map(d => d.count), 1);
+  dailyEl.innerHTML = dayBuckets.map(d => {
+    const width = d.count === 0 ? 0 : Math.max(8, Math.round((d.count / maxDay) * 100));
+    return `<div class="daily-row">
+      <div class="meta">${d.label}</div>
+      <div class="daily-track"><div class="daily-fill" style="width:${width}%"></div></div>
+      <div class="meta">${d.count}</div>
     </div>`;
   }).join('');
 }
