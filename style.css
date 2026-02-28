@@ -1,0 +1,1510 @@
+/* ============================================================
+   观云记 — UI/UX Pro Max Design System
+   Android 适配版：安全区域 · 48dp 触控目标 · 动态视口
+   ============================================================
+   STYLE: Soft UI Evolution + Premium Glassmorphism
+   PATTERN: Content-First + Emotion-Driven
+   TYPOGRAPHY: Noto Serif SC (Display) / Noto Sans SC (Body)
+   KEY EFFECTS: Soft shadows · 200-300ms transitions · Gentle hover
+   AVOID: Harsh animations · Neon colors · Emoji as icons · Dark mode
+   ============================================================ */
+
+/* ─── Google Fonts ─── */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
+
+/* ─── Design Tokens ─── */
+:root {
+    /* Primary – Sky Blue */
+    --color-primary-50: #EFF8FF;
+    --color-primary-100: #DBEEFE;
+    --color-primary-200: #BFE1FD;
+    --color-primary-300: #93CCFC;
+    --color-primary-400: #60B0F9;
+    --color-primary-500: #3B91F5;
+    --color-primary-600: #2573EA;
+    --color-primary-700: #1D5DD4;
+
+    /* Secondary – Sage Green */
+    --color-sage-100: #E8F4EE;
+    --color-sage-200: #C6E3D1;
+    --color-sage-400: #7DBFA5;
+    --color-sage-600: #4E9B7E;
+
+    /* Surface / Background */
+    --color-bg-gradient: linear-gradient(160deg, #C5E8FA 0%, #DCF0FB 28%, #EAF5EF 62%, #F5F0E8 100%);
+    --color-surface-glass: rgba(255, 255, 255, 0.64);
+    --color-surface-glass-strong: rgba(255, 255, 255, 0.85);
+    --color-surface-tint: rgba(191, 225, 253, 0.18);
+    --color-border-glass: rgba(255, 255, 255, 0.78);
+    --color-border-subtle: rgba(147, 204, 252, 0.28);
+
+    /* Text */
+    --color-text-primary: #243648;
+    --color-text-secondary: #4E6A82;
+    --color-text-tertiary: #85A3B8;
+    --color-text-on-accent: #FFFFFF;
+
+    /* Accent / CTA */
+    --color-accent: #3B91F5;
+    --color-accent-hover: #2573EA;
+    --color-accent-subtle: rgba(59, 145, 245, 0.10);
+    --color-accent-glow: rgba(59, 145, 245, 0.30);
+
+    /* Status */
+    --color-danger: #E57373;
+    --color-success: #66BB6A;
+    --color-warning: #FFA726;
+
+    /* Shadows – Soft UI */
+    --shadow-xs: 0 1px 4px rgba(36, 54, 72, 0.06);
+    --shadow-sm: 0 2px 8px rgba(36, 54, 72, 0.08), 0 1px 3px rgba(36, 54, 72, 0.05);
+    --shadow-md: 0 4px 16px rgba(36, 54, 72, 0.10), 0 2px 6px rgba(36, 54, 72, 0.06);
+    --shadow-lg: 0 8px 32px rgba(36, 54, 72, 0.12), 0 4px 12px rgba(36, 54, 72, 0.07);
+    --shadow-xl: 0 16px 48px rgba(36, 54, 72, 0.14), 0 8px 20px rgba(36, 54, 72, 0.08);
+    --shadow-inset: inset 0 1px 3px rgba(36, 54, 72, 0.08);
+
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-full: 9999px;
+
+    /* Motion – 200-300ms per skill guidelines */
+    --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --duration-fast: 150ms;
+    --duration-base: 220ms;
+    --duration-slow: 300ms;
+    --duration-modal: 360ms;
+    --transition-base: var(--duration-base) var(--ease-in-out);
+    --transition-fast: var(--duration-fast) var(--ease-out);
+    --transition-slow: var(--duration-slow) var(--ease-in-out);
+}
+
+/* ─── Reset ─── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    height: 100%;
+}
+
+body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    background: var(--color-bg-gradient);
+    background-attachment: fixed;
+    /* dvh: 随安卓地址栏收起/展开动态调整高度 */
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* 安卓刘海屏/打孔屏安全区域 */
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* ─── prefers-reduced-motion ─── */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AMBIENT BACKGROUND CLOUDS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.bg-clouds {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.48);
+    border-radius: 80px;
+    filter: blur(2px);
+    will-change: transform;
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+}
+
+.cloud-1 {
+    width: 240px;
+    height: 58px;
+    top: 7%;
+    left: 0;
+    animation: driftRight 32s linear infinite;
+}
+
+.cloud-1::before {
+    width: 96px;
+    height: 96px;
+    top: -42px;
+    left: 22px;
+}
+
+.cloud-1::after {
+    width: 70px;
+    height: 70px;
+    top: -30px;
+    left: 95px;
+}
+
+.cloud-2 {
+    width: 180px;
+    height: 46px;
+    top: 20%;
+    right: 0;
+    animation: driftLeft 42s linear 8s infinite;
+    opacity: 0.65;
+}
+
+.cloud-2::before {
+    width: 72px;
+    height: 72px;
+    top: -34px;
+    left: 14px;
+}
+
+.cloud-2::after {
+    width: 52px;
+    height: 52px;
+    top: -23px;
+    left: 72px;
+}
+
+.cloud-3 {
+    width: 150px;
+    height: 38px;
+    top: 50%;
+    left: 55%;
+    animation: driftRight 48s linear 16s infinite;
+    opacity: 0.45;
+}
+
+.cloud-3::before {
+    width: 58px;
+    height: 58px;
+    top: -28px;
+    left: 12px;
+}
+
+.cloud-3::after {
+    width: 44px;
+    height: 44px;
+    top: -20px;
+    left: 58px;
+}
+
+@keyframes driftRight {
+    from {
+        transform: translateX(-120%);
+    }
+
+    to {
+        transform: translateX(120vw);
+    }
+}
+
+@keyframes driftLeft {
+    from {
+        transform: translateX(120vw);
+    }
+
+    to {
+        transform: translateX(-120%);
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   APP SHELL
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.app-shell {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    /* svh: 稳定视口高度，避免安卓地址栏抖动 */
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 481px) {
+    .app-shell {
+        box-shadow: var(--shadow-xl);
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HEADER
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* 刘海屏顶部安全区域 */
+    padding: calc(22px + env(safe-area-inset-top, 0px)) 20px 14px;
+    flex-shrink: 0;
+}
+
+.app-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #1D5DD4 0%, #3B91F5 50%, #60B0F9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.app-date {
+    font-size: 0.77rem;
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+    margin-top: 3px;
+    letter-spacing: 0.03em;
+}
+
+/* Icon Button — 最小触控目标 48×48dp (Material Design) */
+.icon-btn {
+    background: var(--color-surface-glass);
+    border: 1px solid var(--color-border-glass);
+    border-radius: var(--radius-full);
+    /* 视觉尺寸 42px + 内嵌 padding 撑至 48dp 触控区 */
+    width: 42px;
+    height: 42px;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    /* 安卓点击态去除系统高亮 */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.icon-btn:hover {
+    background: var(--color-surface-glass-strong);
+    color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-btn:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.icon-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   VIEWS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.views-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 底部留出导航栏 + 手势导航条安全区域 */
+    padding: 0 16px calc(104px + env(safe-area-inset-bottom, 0px));
+    scrollbar-width: none;
+    /* 安卓惯性滚动 */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+.views-container::-webkit-scrollbar {
+    display: none;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+    animation: viewEnter var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes viewEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GLASS CARD COMPONENT
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.glass-card {
+    background: var(--color-surface-glass);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    border: 1px solid var(--color-border-glass);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    /* Soft inner highlight */
+    box-shadow:
+        var(--shadow-lg),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   WEATHER HERO CARD
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.weather-hero-card {
+    position: relative;
+    overflow: hidden;
+    padding: 24px 22px 20px;
+    margin-bottom: 20px;
+    min-height: 188px;
+}
+
+.weather-hero-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.09;
+    transition: background var(--transition-slow);
+    z-index: 0;
+}
+
+/* Subtle shimmer overlay */
+.weather-hero-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.weather-hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+}
+
+.weather-hero-icon {
+    flex-shrink: 0;
+}
+
+.weather-hero-icon svg {
+    width: 76px;
+    height: 76px;
+    filter: drop-shadow(0 6px 16px rgba(59, 145, 245, 0.28));
+}
+
+.weather-hero-info {
+    flex: 1;
+}
+
+.weather-condition {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.50rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 5px;
+    line-height: 1.25;
+}
+
+.weather-desc {
+    font-size: 0.84rem;
+    color: var(--color-text-secondary);
+    line-height: 1.58;
+    margin-bottom: 4px;
+}
+
+.weather-time {
+    font-size: 0.74rem;
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+}
+
+.weather-suggestion {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(59, 145, 245, 0.09);
+    border: 1px solid rgba(59, 145, 245, 0.16);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 0.83rem;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+}
+
+.suggestion-icon {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Sun pulse animation */
+@keyframes sunPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.92;
+    }
+
+    50% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+
+.weather-svg.sunny {
+    animation: sunPulse 4s ease-in-out infinite;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SECTION HEADERS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 22px 2px 12px;
+}
+
+.section-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: 0.05em;
+}
+
+.section-sub {
+    font-size: 0.78rem;
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    font-size: 0.82rem;
+    color: var(--color-accent);
+    cursor: pointer;
+    font-family: inherit;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+.text-btn:hover {
+    background: var(--color-accent-subtle);
+    color: var(--color-accent-hover);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   WEATHER HISTORY CHIPS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.weather-history {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 2px 10px;
+    scrollbar-width: none;
+}
+
+.weather-history::-webkit-scrollbar {
+    display: none;
+}
+
+.weather-chip {
+    flex-shrink: 0;
+    background: var(--color-surface-glass);
+    border: 1px solid var(--color-border-glass);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 78px;
+    backdrop-filter: blur(12px);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.weather-chip:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background: var(--color-surface-glass-strong);
+}
+
+.weather-chip:active {
+    transform: translateY(-1px);
+}
+
+.weather-chip-icon {
+    font-size: 1.55rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.weather-chip-cond {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 3px;
+    font-weight: 500;
+}
+
+.weather-chip-time {
+    font-size: 0.66rem;
+    color: var(--color-text-tertiary);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NOTES PREVIEW (HOME)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.notes-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   EMPTY STATE
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.empty-state {
+    text-align: center;
+    padding: 36px 20px;
+    color: var(--color-text-tertiary);
+}
+
+.empty-icon {
+    font-size: 2.6rem;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.55;
+}
+
+.empty-state p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+}
+
+.empty-sub {
+    font-size: 0.78rem;
+    margin-top: 5px;
+    opacity: 0.8;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CAMERA / CLOUD RECOGNITION VIEW
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.camera-zone {
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.camera-preview {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: linear-gradient(145deg, #E8F5FF, #D0ECFA);
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    cursor: pointer;
+    border: 2px dashed rgba(59, 145, 245, 0.28);
+    transition: all var(--transition-base);
+}
+
+.camera-preview:hover {
+    border-color: var(--color-accent);
+    background: linear-gradient(145deg, #DDEFFE, #C5E7FA);
+    box-shadow: 0 0 0 4px var(--color-accent-subtle);
+}
+
+.camera-inner {
+    text-align: center;
+    padding: 24px;
+}
+
+.camera-hint {
+    font-size: 0.94rem;
+    color: var(--color-text-secondary);
+    margin-top: 14px;
+    font-weight: 500;
+}
+
+.camera-sub {
+    font-size: 0.78rem;
+    color: var(--color-text-tertiary);
+    margin-top: 5px;
+}
+
+#previewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-lg);
+}
+
+.camera-preview.drag-over {
+    border-color: var(--color-accent);
+    background: linear-gradient(145deg, #D0E8FF, #BAE0FA);
+    box-shadow: 0 0 0 5px var(--color-accent-glow);
+}
+
+.camera-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.camera-actions .btn:first-child {
+    flex: 1.5;
+}
+
+.camera-actions .btn:last-child {
+    flex: 1;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUTTONS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    /* 最小高度 48dp 触控目标 */
+    padding: 13px 20px;
+    min-height: 48px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    -webkit-user-select: none;
+    user-select: none;
+    /* 安卓：禁用双击缩放，加快响应 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke-width: 2;
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--color-accent-glow);
+    outline-offset: 2px;
+}
+
+/* Primary */
+.btn-primary {
+    background: linear-gradient(135deg, #3B91F5 0%, #2573EA 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(59, 145, 245, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 145, 245, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    background: linear-gradient(135deg, #4A9CF6 0%, #2D7EEB 100%);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 8px rgba(59, 145, 245, 0.35);
+}
+
+/* Ghost */
+.btn-ghost {
+    background: var(--color-surface-glass);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-subtle);
+    backdrop-filter: blur(8px);
+}
+
+.btn-ghost:hover {
+    background: var(--color-surface-glass-strong);
+    color: var(--color-accent);
+    border-color: rgba(59, 145, 245, 0.4);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-ghost:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-ghost:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Size variants */
+.btn-sm {
+    padding: 9px 15px;
+    font-size: 0.84rem;
+    border-radius: var(--radius-sm);
+}
+
+.btn-sm svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESULT CARD
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.result-card {
+    padding: 22px;
+    margin-bottom: 18px;
+    animation: viewEnter var(--duration-slow) var(--ease-out) both;
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.result-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.result-condition {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.result-confidence {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+}
+
+.result-details {
+    background: var(--color-surface-tint);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    font-size: 0.86rem;
+    color: var(--color-text-secondary);
+    line-height: 1.72;
+}
+
+.result-suggestion {
+    font-size: 0.86rem;
+    color: var(--color-text-secondary);
+    background: rgba(126, 191, 165, 0.12);
+    border: 1px solid rgba(126, 191, 165, 0.28);
+    border-radius: var(--radius-md);
+    padding: 11px 15px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.result-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.result-actions button {
+    flex: 1;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ANALYZING OVERLAY
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.analyzing-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(197, 232, 250, 0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+}
+
+.analyzing-spinner {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    margin-bottom: 22px;
+}
+
+.spin-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(59, 145, 245, 0.2);
+    border-top-color: var(--color-accent);
+    animation: spinRing 1.1s linear infinite;
+}
+
+.spin-ring-2 {
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 2px solid rgba(59, 145, 245, 0.12);
+    border-bottom-color: rgba(59, 145, 245, 0.5);
+    animation: spinRing 1.8s linear infinite reverse;
+}
+
+.spin-cloud {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    animation: cloudFloat 2.2s ease-in-out infinite;
+}
+
+@keyframes spinRing {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes cloudFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-5px) scale(1.04);
+    }
+}
+
+.analyzing-text {
+    font-size: 0.94rem;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.06em;
+    font-weight: 300;
+    animation: textPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NOTES TOOLBAR
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.notes-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    align-items: center;
+}
+
+.search-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--color-surface-glass);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 11px 14px;
+    backdrop-filter: blur(12px);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-xs);
+}
+
+.search-bar:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-subtle), var(--shadow-xs);
+}
+
+.search-bar svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--color-text-primary);
+    outline: none;
+    min-width: 0;
+}
+
+.search-bar input::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NOTE CARDS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.note-item {
+    background: var(--color-surface-glass);
+    border: 1px solid var(--color-border-glass);
+    border-radius: var(--radius-lg);
+    padding: 17px 18px 17px 22px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* Left accent bar */
+.note-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--color-primary-400), var(--color-sage-400));
+    border-radius: 4px;
+    transition: all var(--transition-base);
+}
+
+.note-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    background: var(--color-surface-glass-strong);
+    border-color: rgba(255, 255, 255, 0.92);
+}
+
+.note-item:hover::before {
+    top: 4px;
+    bottom: 4px;
+    background: linear-gradient(to bottom, var(--color-primary-500), var(--color-sage-600));
+}
+
+.note-item:active {
+    transform: translateY(-1px);
+}
+
+.note-item-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.note-item-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.96rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.38;
+}
+
+.note-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.note-weather-badge {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.note-item-time {
+    font-size: 0.72rem;
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+    white-space: nowrap;
+}
+
+.note-item-preview {
+    font-size: 0.84rem;
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BOTTOM NAVIGATION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    background: rgba(245, 252, 255, 0.88);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.9);
+    /* 底部安全区域：手势导航条 / 虚拟按键 */
+    padding: 10px 8px calc(14px + env(safe-area-inset-bottom, 0px));
+    z-index: 50;
+    box-shadow: 0 -4px 24px rgba(36, 54, 72, 0.06);
+}
+
+.nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+    font-family: inherit;
+    font-size: 0.71rem;
+    font-weight: 400;
+    /* 48dp 最小触控目标 */
+    padding: 6px 4px;
+    min-height: 48px;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+    letter-spacing: 0.03em;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-btn svg {
+    width: 23px;
+    height: 23px;
+    transition: transform var(--transition-base);
+    stroke-width: 1.7;
+}
+
+.nav-btn:hover {
+    color: var(--color-accent);
+}
+
+.nav-btn:hover svg {
+    transform: translateY(-2px) scale(1.05);
+}
+
+.nav-btn.active {
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+.nav-btn.active svg {
+    transform: scale(1.08);
+    filter: drop-shadow(0 3px 8px rgba(59, 145, 245, 0.42));
+}
+
+.nav-btn:focus-visible {
+    outline: 3px solid var(--color-accent-glow);
+    outline-offset: 2px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NOTE EDITOR MODAL
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    /* 刘海 / 打孔屏：确保覆盖整个屏幕 */
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
+    background: rgba(197, 232, 250, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    animation: overlayFadeIn var(--duration-base) var(--ease-out);
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    /* 底部 padding 包含手势导航条安全区域 */
+    padding: 24px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+    max-height: 94dvh;
+    display: flex;
+    flex-direction: column;
+    animation: modalUp var(--duration-modal) var(--ease-spring) both;
+    box-shadow:
+        0 -8px 48px rgba(36, 54, 72, 0.14),
+        0 -2px 12px rgba(36, 54, 72, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Drag handle */
+.modal-card::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(147, 204, 252, 0.5);
+    border-radius: 2px;
+    margin: 0 auto 18px;
+    flex-shrink: 0;
+}
+
+@keyframes modalUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 13px;
+}
+
+.note-title-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    outline: none;
+    padding: 5px 0;
+    border-bottom: 1.5px solid var(--color-border-subtle);
+    transition: border-color var(--transition-base);
+    min-width: 0;
+}
+
+.note-title-input:focus {
+    border-bottom-color: var(--color-accent);
+}
+
+.note-title-input::placeholder {
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+}
+
+.modal-weather-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-accent-subtle);
+    border: 1px solid rgba(59, 145, 245, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 5px 11px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 13px;
+    align-self: flex-start;
+    font-weight: 500;
+}
+
+.note-editor {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 0.96rem;
+    font-weight: 300;
+    color: var(--color-text-primary);
+    line-height: 1.9;
+    resize: none;
+    outline: none;
+    min-height: 180px;
+    max-height: 52dvh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.note-editor::-webkit-scrollbar {
+    display: none;
+}
+
+.note-editor::placeholder {
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.char-count {
+    font-size: 0.77rem;
+    color: var(--color-text-tertiary);
+    font-weight: 300;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.modal-close {
+    flex-shrink: 0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCROLLBAR
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 145, 245, 0.2) transparent;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESPONSIVE — 安卓常见断点
+   360dp (小屏) · 390dp · 412dp · 768dp
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* 360dp — 最小常见安卓宽度（Pixel 3a / 小米等） */
+@media (max-width: 360px) {
+    .app-title {
+        font-size: 1.48rem;
+    }
+
+    .app-header {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .weather-condition {
+        font-size: 1.22rem;
+    }
+
+    .weather-hero-icon svg {
+        width: 60px;
+        height: 60px;
+    }
+
+    .weather-hero-content {
+        gap: 14px;
+    }
+
+    .weather-hero-card {
+        padding: 20px 16px 16px;
+    }
+
+    .views-container {
+        padding: 0 12px calc(104px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .btn {
+        padding: 11px 14px;
+        font-size: 0.86rem;
+    }
+
+    .nav-btn {
+        font-size: 0.67rem;
+    }
+
+    .nav-btn svg {
+        width: 21px;
+        height: 21px;
+    }
+
+    .result-card {
+        padding: 16px;
+    }
+
+    .camera-zone {
+        padding: 12px;
+    }
+}
+
+/* 375dp — iPhone SE / 部分安卓 */
+@media (max-width: 375px) and (min-width: 361px) {
+    .app-title {
+        font-size: 1.52rem;
+    }
+
+    .weather-condition {
+        font-size: 1.28rem;
+    }
+
+    .weather-hero-icon svg {
+        width: 64px;
+        height: 64px;
+    }
+
+    .btn {
+        padding: 11px 16px;
+        font-size: 0.87rem;
+    }
+}
+
+/* 412dp — Pixel 7 / Samsung S 系列标准宽度 */
+@media (min-width: 400px) and (max-width: 480px) {
+    .weather-hero-card {
+        padding: 26px 22px 20px;
+    }
+}
+
+/* 平板 / 大屏安卓 */
+@media (min-width: 768px) {
+    .views-container {
+        padding: 0 24px calc(104px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .weather-hero-card {
+        padding: 28px 28px 22px;
+    }
+
+    .weather-hero-icon svg {
+        width: 88px;
+        height: 88px;
+    }
+}
+
+/* 横屏安卓：左右安全区域 */
+@media (orientation: landscape) and (max-height: 500px) {
+    .app-header {
+        padding-top: 12px;
+        padding-bottom: 8px;
+    }
+
+    .weather-hero-card {
+        min-height: 140px;
+    }
+
+    .bottom-nav {
+        padding-top: 6px;
+    }
+
+    .nav-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .nav-btn span {
+        display: none;
+    }
+
+    /* 横屏隐藏文字节省空间 */
+    .views-container {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    }
+}
