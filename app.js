@@ -111,8 +111,39 @@ function renderHero() {
   $('heroTip').textContent = `建议：${w.tip}`;
 }
 
+function renderWeatherTrend() {
+  const trendEl = $('weatherTrend');
+  const now = Date.now();
+  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const recent = state.weatherRecords.filter(r => r.ts >= sevenDaysAgo);
+
+  if (recent.length === 0) {
+    trendEl.innerHTML = '<p class="trend-empty">近7天暂无观测数据。</p>';
+    return;
+  }
+
+  const order = ['sunny', 'partly', 'cloudy', 'overcast', 'rainy'];
+  const counts = order.map(type => ({
+    type,
+    label: WEATHER[type].label,
+    count: recent.filter(r => r.type === type).length
+  })).filter(x => x.count > 0);
+
+  const maxCount = Math.max(...counts.map(c => c.count), 1);
+
+  trendEl.innerHTML = counts.map(c => {
+    const width = Math.max(8, Math.round((c.count / maxCount) * 100));
+    return `<div class="trend-row">
+      <div class="trend-label">${weatherIcon(c.type, 'inline-weather-icon')} ${c.label}</div>
+      <div class="trend-track"><div class="trend-fill" style="width:${width}%"></div></div>
+      <div class="meta">${c.count}</div>
+    </div>`;
+  }).join('');
+}
+
 function renderWeatherList() {
   $('weatherCount').textContent = `${state.weatherRecords.length} 条`;
+  renderWeatherTrend();
   $('weatherList').innerHTML = state.weatherRecords.slice(0, 30).map((r) => {
     const w = WEATHER[r.type];
     return `<article class="item"><div class="row" style="gap:6px"><strong>${weatherIcon(r.type, 'inline-weather-icon')} ${w.label}</strong></div><div class="meta">置信度 ${r.confidence}% · ${fmt(r.ts)}</div></article>`;
