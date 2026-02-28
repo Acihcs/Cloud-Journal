@@ -118,13 +118,13 @@ body {
     background-attachment: fixed;
     /* dvh: 随安卓地址栏收起/展开动态调整高度 */
     min-height: 100dvh;
+    min-height: -webkit-fill-available;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* 安卓刘海屏/打孔屏安全区域 */
-    padding-top: env(safe-area-inset-top);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    -webkit-text-size-adjust: 100%;
+    /* 安全区由 header/nav/modal 分别处理，避免重复叠加 */
+    padding: 0;
 }
 
 /* ─── prefers-reduced-motion ─── */
@@ -260,9 +260,11 @@ body {
     position: relative;
     z-index: 1;
     max-width: 480px;
+    width: 100%;
     margin: 0 auto;
-    /* svh: 稳定视口高度，避免安卓地址栏抖动 */
+    /* 优先 dvh，退化到 svh 兼容旧安卓 WebView */
     min-height: 100svh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
 }
@@ -1132,10 +1134,11 @@ body {
 .bottom-nav {
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     width: 100%;
     max-width: 480px;
+    margin: 0 auto;
     display: flex;
     background: rgba(245, 252, 255, 0.88);
     backdrop-filter: blur(24px) saturate(1.8);
@@ -1145,6 +1148,7 @@ body {
     padding: 10px 8px calc(14px + env(safe-area-inset-bottom, 0px));
     z-index: 50;
     box-shadow: 0 -4px 24px rgba(36, 54, 72, 0.06);
+    transition: transform var(--transition-base), opacity var(--transition-base);
 }
 
 .nav-btn {
@@ -1227,6 +1231,19 @@ body {
     to {
         opacity: 1;
     }
+}
+
+/* 安卓输入法弹起时，避免底部导航遮挡输入区域 */
+body:has(input:focus),
+body:has(textarea:focus) {
+    padding-bottom: 0;
+}
+
+body:has(input:focus) .bottom-nav,
+body:has(textarea:focus) .bottom-nav {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .modal-card {
