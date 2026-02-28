@@ -42,7 +42,11 @@ main { display:grid; gap:12px; }
   backdrop-filter: blur(8px);
 }
 .hero-main { display:flex; gap:10px; align-items:center; }
-.icon { font-size:2rem; }
+.icon { display:flex; align-items:center; justify-content:center; color:#4f89bf; }
+.weather-icon { display:inline-flex; vertical-align:middle; color: currentColor; }
+.weather-icon svg { width: 1em; height: 1em; display:block; }
+.hero-weather-icon { font-size: 2rem; }
+.inline-weather-icon { font-size: 1rem; margin-right: 2px; color:#4f89bf; }
 h2,h3 { margin:0 0 8px; }
 .tip { margin:8px 0 0; font-size:.9rem; color:#4f7692; }
 .uploader {
