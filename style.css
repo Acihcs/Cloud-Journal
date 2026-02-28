@@ -44,6 +44,47 @@ body {
 h1 { margin:0; font-size: 1.4rem; line-height: 1.2; letter-spacing: .01em; }
 .muted { color: var(--muted); font-size:.9rem; margin:4px 0 0; }
 main { display:grid; gap:14px; }
+.tabbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.tab {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.75);
+  color: var(--text);
+  min-height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tab.is-active {
+  background: #3b84d7;
+  color: #fff;
+  border-color: transparent;
+}
+.page {
+  display: grid;
+  gap: 14px;
+}
+.settings-form {
+  display: grid;
+  gap: 10px;
+}
+.settings-form label {
+  display: grid;
+  gap: 6px;
+  font-size: .92rem;
+}
+.settings-form input,
+.settings-form select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 42px;
+  font: inherit;
+  background: rgba(255,255,255,.8);
+}
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -157,6 +198,7 @@ strong { font-weight: 600; }
 }
 #analyzeBtn { grid-column: 1 / -1; }
 #retryBtn { width: 100%; margin-top: 8px; }
+#cancelAnalyzeBtn { width: 100%; margin-top: 6px; }
 .btn {
   border:none; background: var(--primary); color:#fff; padding:10px 14px;
   border-radius:10px; cursor:pointer; min-height:44px;
@@ -173,6 +215,15 @@ strong { font-weight: 600; }
 }
 .btn.ghost:hover:not(:disabled) {
   background: rgba(255,255,255,.92);
+}
+.btn.danger {
+  background: #f8dede;
+  color: #8e3f3f;
+  border: 1px solid #efbcbc;
+  box-shadow: none;
+}
+.btn.danger:hover:not(:disabled) {
+  background: #f6d3d3;
 }
 .btn:disabled {
   opacity:1;

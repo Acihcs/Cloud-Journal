@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#d9eef9" />
   <title>观云记</title>
-  <link rel="stylesheet" href="./style.css?v=20260228-1310" />
+  <link rel="stylesheet" href="./style.css?v=20260228-1630" />
 </head>
 <body>
   <div class="app">
@@ -18,55 +18,95 @@
     </header>
 
     <main>
-      <section class="card">
-        <h3>观云识别</h3>
-        <p id="recognizerStatus" class="tip">状态：等待观测。先上传天空照片再开始识别。</p>
-        <label for="photoInput" class="uploader" id="uploader">
-          <img id="preview" alt="" hidden onerror="this.hidden=true;this.classList.remove('is-ready');" />
-          <div id="uploadHint" class="upload-hint">
-            <div class="upload-icon" aria-hidden="true">☁️</div>
-            <div class="upload-text">点击上传 / 拍摄天空照片</div>
-            <div class="upload-sub">建议拍摄天空占画面 70% 以上</div>
-            <div class="upload-badge" aria-hidden="true">＋ 拍照</div>
+      <nav class="tabbar" aria-label="页面导航">
+        <button class="tab is-active" data-tab="recognizer">识别</button>
+        <button class="tab" data-tab="records">记录</button>
+        <button class="tab" data-tab="settings">设置</button>
+      </nav>
+
+      <section id="page-recognizer" class="page is-active">
+        <section class="card">
+          <h3>观云识别</h3>
+          <p id="recognizerStatus" class="tip">状态：等待观测。先上传天空照片再开始识别。</p>
+          <label for="photoInput" class="uploader" id="uploader">
+            <img id="preview" alt="" hidden onerror="this.hidden=true;this.classList.remove('is-ready');" />
+            <div id="uploadHint" class="upload-hint">
+              <div class="upload-icon" aria-hidden="true">☁️</div>
+              <div class="upload-text">点击上传 / 拍摄天空照片</div>
+              <div class="upload-sub">建议拍摄天空占画面 70% 以上</div>
+              <div class="upload-badge" aria-hidden="true">＋ 拍照</div>
+            </div>
+          </label>
+          <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
+
+          <div id="processingLayer" class="processing-layer" hidden>
+            <div class="scan-line"></div>
+            <div class="processing-cloud">☁️</div>
           </div>
-        </label>
-        <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
+          <p id="processingText" class="processing-text" hidden>正在云层中寻找线索...</p>
+          <button id="cancelAnalyzeBtn" class="btn danger" hidden>取消识别</button>
 
-        <div id="processingLayer" class="processing-layer" hidden>
-          <div class="scan-line"></div>
-          <div class="processing-cloud">☁️</div>
-        </div>
-        <p id="processingText" class="processing-text" hidden>正在云层中寻找线索...</p>
+          <div class="actions">
+            <button id="analyzeBtn" class="btn" disabled>开始识别</button>
+            <button id="saveWeatherBtn" class="btn ghost" disabled>保存观测</button>
+            <button id="writeWithWeatherBtn" class="btn" disabled>写点想法</button>
+          </div>
 
-        <div class="actions">
-          <button id="analyzeBtn" class="btn" disabled>开始识别</button>
-          <button id="saveWeatherBtn" class="btn ghost" disabled>保存观测</button>
-          <button id="writeWithWeatherBtn" class="btn" disabled>写点想法</button>
-        </div>
-
-        <div id="result" class="result" aria-live="polite" hidden></div>
-        <button id="retryBtn" class="btn ghost" hidden>重新拍摄/上传</button>
-        <canvas id="analysisCanvas" hidden></canvas>
+          <div id="result" class="result" aria-live="polite" hidden></div>
+          <button id="retryBtn" class="btn ghost" hidden>重新拍摄/上传</button>
+          <canvas id="analysisCanvas" hidden></canvas>
+        </section>
       </section>
 
-      <section class="card">
-        <div class="row between section-head">
-          <h3>观测记录</h3>
-          <span class="muted" id="weatherCount">0 条</span>
-        </div>
-        <div id="weatherSummary" class="trend-summary"></div>
-        <div id="weatherTrend" class="trend"></div>
-        <div id="weatherDailyTrend" class="daily-trend"></div>
-        <div id="weatherList" class="list"></div>
+      <section id="page-records" class="page" hidden>
+        <section class="card">
+          <div class="row between section-head">
+            <h3>观测记录</h3>
+            <span class="muted" id="weatherCount">0 条</span>
+          </div>
+          <div id="weatherSummary" class="trend-summary"></div>
+          <div id="weatherTrend" class="trend"></div>
+          <div id="weatherDailyTrend" class="daily-trend"></div>
+          <div id="weatherList" class="list"></div>
+        </section>
+
+        <section class="card">
+          <div class="row between section-head notes-head">
+            <h3>笔记</h3>
+            <label for="searchInput" class="sr-only">搜索笔记</label>
+            <input id="searchInput" class="search" placeholder="搜索标题或内容..." />
+          </div>
+          <div id="notesList" class="list"></div>
+        </section>
       </section>
 
-      <section class="card">
-        <div class="row between section-head notes-head">
-          <h3>笔记</h3>
-          <label for="searchInput" class="sr-only">搜索笔记</label>
-          <input id="searchInput" class="search" placeholder="搜索标题或内容..." />
-        </div>
-        <div id="notesList" class="list"></div>
+      <section id="page-settings" class="page" hidden>
+        <section class="card">
+          <h3>设置</h3>
+          <form id="settingsForm" class="settings-form">
+            <label>天气厂商
+              <select id="providerInput">
+                <option value="openweather">OpenWeather</option>
+                <option value="open-meteo">Open-Meteo</option>
+                <option value="none">None</option>
+              </select>
+            </label>
+            <label>API Key
+              <input id="apiKeyInput" type="text" placeholder="可选：填写天气服务 API Key" />
+            </label>
+            <label>默认城市
+              <input id="cityInput" type="text" placeholder="例如：荆州" />
+            </label>
+            <label>单位
+              <select id="unitsInput">
+                <option value="metric">公制（℃）</option>
+                <option value="imperial">英制（℉）</option>
+              </select>
+            </label>
+            <button id="saveSettingsBtn" type="button" class="btn">保存设置</button>
+            <p id="settingsStatus" class="muted"></p>
+          </form>
+        </section>
       </section>
     </main>
   </div>
@@ -84,6 +124,6 @@
     </form>
   </dialog>
 
-  <script src="./app.js?v=20260228-1310"></script>
+  <script src="./app.js?v=20260228-1630"></script>
 </body>
 </html>

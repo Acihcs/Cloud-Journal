@@ -33,12 +33,19 @@ const PROCESSING_LINES = [
 
 const KEY = {
   weather: 'cloud_journal_weather',
-  notes: 'cloud_journal_notes'
+  notes: 'cloud_journal_notes',
+  settings: 'cloud_journal_settings'
 };
 
 const state = {
   weatherRecords: [],
   notes: [],
+  settings: {
+    provider: 'openweather',
+    apiKey: '',
+    city: '荆州',
+    units: 'metric'
+  },
   pendingResult: null,
   pendingWeatherTypeForNote: null,
   editingNoteId: null
@@ -64,6 +71,8 @@ function load() {
   try {
     state.weatherRecords = JSON.parse(localStorage.getItem(KEY.weather) || '[]');
     state.notes = JSON.parse(localStorage.getItem(KEY.notes) || '[]');
+    const savedSettings = JSON.parse(localStorage.getItem(KEY.settings) || '{}');
+    state.settings = { ...state.settings, ...savedSettings };
   } catch {
     state.weatherRecords = [];
     state.notes = [];
@@ -73,6 +82,10 @@ function load() {
 function save() {
   localStorage.setItem(KEY.weather, JSON.stringify(state.weatherRecords));
   localStorage.setItem(KEY.notes, JSON.stringify(state.notes));
+}
+
+function saveSettings() {
+  localStorage.setItem(KEY.settings, JSON.stringify(state.settings));
 }
 
 function startProcessingUI() {
@@ -292,6 +305,30 @@ function renderAll() {
   renderNotes();
 }
 
+function switchTab(tab) {
+  const tabs = document.querySelectorAll('.tab');
+  const pages = {
+    recognizer: $('page-recognizer'),
+    records: $('page-records'),
+    settings: $('page-settings')
+  };
+
+  tabs.forEach((btn) => btn.classList.toggle('is-active', btn.dataset.tab === tab));
+  Object.entries(pages).forEach(([key, page]) => {
+    if (!page) return;
+    const active = key === tab;
+    page.hidden = !active;
+    page.classList.toggle('is-active', active);
+  });
+}
+
+function renderSettings() {
+  $('providerInput').value = state.settings.provider || 'openweather';
+  $('apiKeyInput').value = state.settings.apiKey || '';
+  $('cityInput').value = state.settings.city || '';
+  $('unitsInput').value = state.settings.units || 'metric';
+}
+
 function openNoteDialog(noteId = null, weatherType = null) {
   const dialog = $('noteDialog');
   const title = $('noteTitle');
@@ -341,6 +378,12 @@ function saveNote() {
 
 function setup() {
   $('todayText').textContent = new Date().toLocaleDateString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  document.querySelectorAll('.tab').forEach((btn) => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  switchTab('recognizer');
+  renderSettings();
 
   const input = $('photoInput');
   const preview = $('preview');
@@ -456,6 +499,18 @@ function setup() {
   $('saveNote').addEventListener('click', saveNote);
   $('cancelNote').addEventListener('click', () => $('noteDialog').close());
   $('searchInput').addEventListener('input', renderNotes);
+
+  $('saveSettingsBtn').addEventListener('click', () => {
+    state.settings.provider = $('providerInput').value;
+    state.settings.apiKey = $('apiKeyInput').value.trim();
+    state.settings.city = $('cityInput').value.trim() || '荆州';
+    state.settings.units = $('unitsInput').value;
+    saveSettings();
+    $('settingsStatus').textContent = '设置已保存';
+    setTimeout(() => {
+      $('settingsStatus').textContent = '';
+    }, 1500);
+  });
 }
 
 function init() {
