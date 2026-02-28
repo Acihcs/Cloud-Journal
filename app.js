@@ -111,12 +111,18 @@ const WEATHER_ICONS_SVG = {
 //  状态管理
 // ─────────────────────────────────────────
 
+const STORAGE_KEYS = Object.freeze({
+  weather: 'guanyunji_weather',
+  notes: 'guanyunji_notes'
+});
+
 const state = {
   currentView: 'viewHome',
   weatherRecords: [],
   notes: [],
   currentNoteId: null,
   pendingWeather: null,  // 识别完成待保存的天气
+  pendingNoteWeatherType: null,
   searchQuery: ''
 };
 
@@ -155,23 +161,38 @@ function getTodayStr() {
 
 function clamp(val, min, max) { return Math.min(Math.max(val, min), max); }
 
+function debounce(fn, delay = 220) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
 // ─────────────────────────────────────────
 //  数据持久化
 // ─────────────────────────────────────────
 
+function parseJsonSafe(raw, fallback) {
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
 function saveData() {
   try {
-    localStorage.setItem('guanyunji_weather', JSON.stringify(state.weatherRecords));
-    localStorage.setItem('guanyunji_notes',   JSON.stringify(state.notes));
+    localStorage.setItem(STORAGE_KEYS.weather, JSON.stringify(state.weatherRecords));
+    localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(state.notes));
   } catch(e) { console.warn('localStorage save failed', e); }
 }
 
 function loadData() {
   try {
-    const w = localStorage.getItem('guanyunji_weather');
-    const n = localStorage.getItem('guanyunji_notes');
-    if (w) state.weatherRecords = JSON.parse(w);
-    if (n) state.notes = JSON.parse(n);
+    state.weatherRecords = parseJsonSafe(localStorage.getItem(STORAGE_KEYS.weather), []);
+    state.notes = parseJsonSafe(localStorage.getItem(STORAGE_KEYS.notes), []);
   } catch(e) { console.warn('localStorage load failed', e); }
 }
 
@@ -361,8 +382,12 @@ function renderNotesList() {
   });
 }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function escHtml(str = '') {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
 
 function renderAll() {
@@ -392,6 +417,7 @@ function switchView(viewId) {
 // ─────────────────────────────────────────
 
 let currentImageFile = null;
+let currentObjectUrl = null;
 
 function setupCamera() {
   const photoInput   = document.getElementById('photoInput');
@@ -426,8 +452,10 @@ function setupCamera() {
 
   function loadImageFile(file) {
     currentImageFile = file;
-    const url = URL.createObjectURL(file);
-    previewImg.src = url;
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(file);
+
+    previewImg.src = currentObjectUrl;
     previewImg.style.display = 'block';
     placeholder.style.display = 'none';
     analyzeBtn.disabled = false;
@@ -509,6 +537,10 @@ function setupResultActions() {
 //  笔记管理
 // ─────────────────────────────────────────
 
+function findNoteById(noteId) {
+  return state.notes.find(n => n.id === noteId) || null;
+}
+
 function openNoteModal(noteId, weatherType = null) {
   const modal       = document.getElementById('noteModal');
   const titleInput  = document.getElementById('noteTitleInput');
@@ -520,7 +552,7 @@ function openNoteModal(noteId, weatherType = null) {
   const charCount   = document.getElementById('charCount');
 
   if (noteId) {
-    const note = state.notes.find(n => n.id === noteId);
+    const note = findNoteById(noteId);
     if (!note) return;
     state.currentNoteId = noteId;
     titleInput.value = note.title || '';
@@ -554,20 +586,18 @@ function openNoteModal(noteId, weatherType = null) {
   modal.style.display = 'flex';
   setTimeout(() => editor.focus(), 300);
 
-  // store pending weather type for save
-  modal._pendingWeatherType = weatherType;
+  state.pendingNoteWeatherType = weatherType;
 }
 
 function closeNoteModal() {
   document.getElementById('noteModal').style.display = 'none';
   state.currentNoteId = null;
+  state.pendingNoteWeatherType = null;
 }
 
 function saveNote() {
   const title   = document.getElementById('noteTitleInput').value.trim();
   const content = document.getElementById('noteEditor').value.trim();
-  const modal   = document.getElementById('noteModal');
-
   if (!content && !title) {
     document.getElementById('noteEditor').focus();
     return;
@@ -575,7 +605,7 @@ function saveNote() {
 
   const weatherType = state.currentNoteId
     ? (state.notes.find(n => n.id === state.currentNoteId)?.weatherType || null)
-    : (modal._pendingWeatherType || null);
+    : state.pendingNoteWeatherType;
 
   if (state.currentNoteId) {
     const idx = state.notes.findIndex(n => n.id === state.currentNoteId);
@@ -636,9 +666,13 @@ function setupNavigation() {
   document.getElementById('viewAllNotes').addEventListener('click', () => switchView('viewNotes'));
   document.getElementById('newNoteBtn').addEventListener('click', () => openNoteModal(null));
 
-  document.getElementById('searchInput').addEventListener('input', function() {
-    state.searchQuery = this.value.trim();
+  const onSearchInput = debounce((value) => {
+    state.searchQuery = value.trim();
     renderNotesList();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', function() {
+    onSearchInput(this.value);
   });
 }
 
