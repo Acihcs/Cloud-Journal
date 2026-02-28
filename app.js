@@ -50,6 +50,8 @@ const fmt = (ts) => new Date(ts).toLocaleString('zh-CN', { hour12: false });
 
 let processingTimer = null;
 let processingIndex = 0;
+let currentAnalyzeSeq = 0;
+let currentObjectUrl = null;
 
 function weatherIcon(type, className = '') {
   const svg = WEATHER_ICONS[type] || WEATHER_ICONS.default;
@@ -92,6 +94,40 @@ function stopProcessingUI() {
   processingTimer = null;
   $('processingLayer').hidden = true;
   $('processingText').hidden = true;
+}
+
+function resetRecognitionFlow() {
+  const input = $('photoInput');
+  const preview = $('preview');
+  const hint = $('uploadHint');
+  const uploader = $('uploader');
+
+  currentAnalyzeSeq += 1;
+  stopProcessingUI();
+  state.pendingResult = null;
+
+  if (currentObjectUrl) {
+    URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = null;
+  }
+
+  input.value = '';
+  preview.classList.remove('is-ready');
+  preview.hidden = true;
+  preview.removeAttribute('src');
+  hint.hidden = false;
+  hint.style.display = 'grid';
+  uploader.classList.remove('has-image');
+
+  $('result').hidden = true;
+  $('retryBtn').hidden = true;
+  $('saveWeatherBtn').disabled = true;
+  $('writeWithWeatherBtn').disabled = true;
+  $('analyzeBtn').disabled = true;
+  $('analyzeBtn').textContent = '开始识别';
+  $('cancelAnalyzeBtn').hidden = true;
+
+  renderRecognizerStatus();
 }
 
 function isProbablySky(stats) {
@@ -316,14 +352,12 @@ function setup() {
   hint.hidden = false;
   hint.style.display = 'grid';
   uploader.classList.remove('has-image');
-  let objectUrl = null;
-
   input.addEventListener('change', () => {
     const file = input.files?.[0];
     if (!file) return;
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrl = URL.createObjectURL(file);
-    preview.src = objectUrl;
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(file);
+    preview.src = currentObjectUrl;
     preview.hidden = false;
     preview.classList.add('is-ready');
     hint.hidden = true;
@@ -336,6 +370,7 @@ function setup() {
     $('saveWeatherBtn').disabled = true;
     $('writeWithWeatherBtn').disabled = true;
     $('analyzeBtn').disabled = false;
+    $('cancelAnalyzeBtn').hidden = false;
     renderRecognizerStatus();
   });
 
@@ -344,13 +379,18 @@ function setup() {
 
     const analyzeBtn = $('analyzeBtn');
     const retryBtn = $('retryBtn');
+    const seq = ++currentAnalyzeSeq;
+
     analyzeBtn.disabled = true;
     const prevText = analyzeBtn.textContent;
     analyzeBtn.textContent = '识别中...';
     retryBtn.hidden = true;
+    $('cancelAnalyzeBtn').hidden = false;
 
     startProcessingUI();
     await new Promise(r => setTimeout(r, 1450));
+    if (seq !== currentAnalyzeSeq) return;
+
     const result = analyzeImage(preview);
     stopProcessingUI();
 
@@ -371,9 +411,8 @@ function setup() {
       return;
     }
 
-    state.pendingResult = result;
-    const w = WEATHER[result.type];
     const c = CLOUD_COPY[result.type];
+    state.pendingResult = result;
     $('result').hidden = false;
     $('result').innerHTML = `
       <strong>${weatherIcon(result.type, 'inline-weather-icon')} ${c.name}</strong><br>
@@ -408,6 +447,11 @@ function setup() {
   });
 
   $('retryBtn').addEventListener('click', () => input.click());
+  $('cancelAnalyzeBtn').addEventListener('click', () => {
+    resetRecognitionFlow();
+    const statusEl = $('recognizerStatus');
+    if (statusEl) statusEl.textContent = '状态：已取消识别，请重新拍摄或上传天空照片。';
+  });
   $('newNoteQuick').addEventListener('click', () => openNoteDialog());
   $('saveNote').addEventListener('click', saveNote);
   $('cancelNote').addEventListener('click', () => $('noteDialog').close());
